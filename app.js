@@ -6,6 +6,7 @@ const session = require("express-session");
 const flash = require("connect-flash");
 const passport = require("passport");
 const cookieParser = require("cookie-parser");
+const helmet = require("helmet");
 
 require("dotenv").config();
 
@@ -23,6 +24,7 @@ const db = mongoose.connection;
 
 db.on("error", () => console.log("db unsuccessfull"));
 
+app.use(helmet());
 app.use(express.static(__dirname + "/public"));
 app.use(
   express.urlencoded({
