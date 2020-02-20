@@ -38,7 +38,7 @@ app.use(cookieParser());
 
 app.use(
   session({
-    secret: "this is a secret",
+    secret: process.env.SESSION_SECRET,
     resave: true,
     saveUninitialized: true
   })
@@ -58,4 +58,6 @@ app.use((req, res, next) => {
 
 app.use("/", require("./routes/router"));
 
-app.listen(3005, () => console.log("server running 3005"));
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => console.log("port running 3005"));
