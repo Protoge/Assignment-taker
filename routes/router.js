@@ -13,14 +13,21 @@ router.get("/", ensureAuthenticated, (req, res) => {
   //     assignments
   //   });
   // });
-  Student.findById(req.user._id, (err, user) => {
-    Assignment.find({ studentId: user._id }, (err, assignments) => {
-      if (err) throw err;
-      res.render("layout", {
-        assignments
+  Student.findById(req.user._id).then(user => {
+    Assignment.find({ studentId: user._id })
+      .sort({ dueDate: 1 })
+      .then(assignments => {
+        return res.render("layout", { assignments });
       });
-    });
   });
+  //   Student.findById(req.user._id, (err, user) => {
+  //     Assignment.find({ studentId: user._id }, (err, assignments) => {
+  //       if (err) throw err;
+  //       res.render("layout", {
+  //         assignments
+  //       });
+  //     });
+  //   });
 });
 
 router.post("/submit", async (req, res) => {

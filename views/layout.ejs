@@ -39,12 +39,22 @@
       </div>
       <% assignments.forEach(function(assign){ %>
       <div class="card" style="color:black">
-        <div class="card-header">
+        <div class="card-header" style="font-weight:900">
           <%= assign.subject %>
         </div>
         <div class="card-body">
           <p class="card-text display-5"><%= assign.body %></p>
-          <p>Due date: <%= assign.dueDate %></p>
+          <p>
+            Due date: <% if (new Date() > new Date(assign.dueDate)) { %>
+            <span style="font-weight: bold;" class="text-danger"
+              ><%= assign.dueDate %></span
+            >
+            <%}else{ %>
+            <span style="font-weight: bold;" class="text-success"
+              ><%= assign.dueDate %></span
+            >
+            <%}%>
+          </p>
         </div>
         <a
           href="/complete/<%= assign.body %>"
