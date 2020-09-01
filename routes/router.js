@@ -13,10 +13,10 @@ router.get("/", ensureAuthenticated, (req, res) => {
   //     assignments
   //   });
   // });
-  Student.findById(req.user._id).then(user => {
+  Student.findById(req.user._id).then((user) => {
     Assignment.find({ studentId: user._id })
       .sort({ dueDate: 1 })
-      .then(assignments => {
+      .then((assignments) => {
         return res.render("layout", { assignments });
       });
   });
@@ -36,7 +36,7 @@ router.post("/submit", async (req, res) => {
     body,
     subject,
     dueDate,
-    studentId: req.user._id
+    studentId: req.user._id,
   });
   newAssignment.save().then(() => {
     Student.findById(req.user._id, async (err, user) => {
@@ -59,16 +59,31 @@ router.get("/cancel/:id", (req, res) => {
   });
 });
 
-router.get("/complete/:id", (req, res) => {
-  const newComplete = new Complete({
-    comp: req.params.id
-  });
+router.get("/complete/:subject/:body/:id", async (req, res) => {
+  try {
+    const newComplete = new Complete({
+      student: req.user._id,
+      subject: req.params.subject,
+      comp: req.params.body,
+    });
 
-  newComplete.save().then(() => {
-    console.log("saved completed assignment");
-    Assignment.findOneAndDelete(
+    await newComplete.save();
+
+    await Student.findById(req.user._id, async (err, user) => {
+      try {
+        const assignmentToBeDeleted = await user.assignments.indexOf(
+          req.params.id
+        );
+        await user.assignments.splice(assignmentToBeDeleted, 1);
+        await user.save();
+      } catch (err) {
+        console.log(err);
+      }
+    });
+
+    await Assignment.findOneAndDelete(
       {
-        body: req.params.id
+        _id: req.params.id,
       },
       (err, deleted) => {
         if (err) res.redirect("/");
@@ -78,7 +93,10 @@ router.get("/complete/:id", (req, res) => {
         }
       }
     );
-  });
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
 });
 
 // Student routes
@@ -87,7 +105,7 @@ router.post("/student/register", (req, res, next) => {
   passport.authenticate("local-signup", {
     successRedirect: "/",
     failureRedirect: "/student/signin-signup",
-    failureFlash: true
+    failureFlash: true,
   })(req, res, next);
 });
 
@@ -95,7 +113,7 @@ router.post("/student/signin", (req, res, next) => {
   passport.authenticate("local", {
     successRedirect: "/",
     failureRedirect: "/student/signin-signup",
-    failureFlash: true
+    failureFlash: true,
   })(req, res, next);
 });
 

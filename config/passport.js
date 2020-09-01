@@ -2,45 +2,44 @@ const LocalStrategy = require("passport-local").Strategy;
 
 const Student = require("../models/student.model");
 
-const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const passport = require("passport");
-module.exports = function(passport) {
+module.exports = function (passport) {
   passport.use(
     new LocalStrategy(
       {
-        usernameField: "username"
+        usernameField: "username",
       },
       (username, password, done) => {
         // Match user
         Student.findOne({
-          username: username
+          username: username,
         })
-          .then(user => {
-            if (!user || password !== user.password) {
+          .then(async (user) => {
+            if (!user) {
               // null = is the error, false = user, message = flash error
               return done(null, false, {
-                message: "Username or Password is incorrect"
+                message: "Username or Password is incorrect",
               });
             }
 
-            return done(null, user, {
-              message: "You are now logged in"
-            });
-            // // Match the password with hashed password, isMatch is a boolean if it matches it return true
-            // bcrypt.compare(password, user.password, (err, isMatch) => {
-            //     if (err) throw err;
+            // Match the password with hashed password, isMatch is a boolean if it matches it return true
+            await bcrypt.compare(password, user.password, (err, isMatch) => {
+              if (err) throw err;
 
-            //     if (isMatch) {
-            //         return done(null, user);
-            //     } else {
-            //         return done(null, false, {
-            //             message: 'Password is incorrect'
-            //         })
-            //     }
-            // })
+              if (isMatch) {
+                return done(null, user, {
+                  message: "You are now logged in",
+                });
+              } else {
+                return done(null, false, {
+                  message: "Username or Password is incorrect",
+                });
+              }
+            });
           })
-          .catch(err => console.log(err));
+          .catch((err) => console.log(err));
       }
     )
   );
@@ -49,18 +48,19 @@ module.exports = function(passport) {
     "local-signup",
     new LocalStrategy(
       {
-        usernameField: "username"
+        usernameField: "username",
       },
       (username, password, done) => {
-        Student.findOne({ username: username }).then(user => {
+        Student.findOne({ username: username }).then(async (user) => {
           if (user) {
             return done(null, false, { message: "Username already exist" });
           }
+          const hashedPassword = await bcrypt.hash(password, 10);
           const newStudent = new Student({
             username,
-            password
+            password: hashedPassword,
           });
-          newStudent.save(err => {
+          newStudent.save((err) => {
             done(err, newStudent);
           });
         });

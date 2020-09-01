@@ -4,7 +4,7 @@
     <h1 class="display-1">Assignments</h1>
     <div class="assign-list">
       <div class="arr">
-        <i class="down" style="font-size:100px" aria-hidden="true"></i>
+        <i class="down" style="font-size: 100px" aria-hidden="true"></i>
       </div>
       <div class="submit-assignment">
         <form method="POST" action="/submit" class="main-form">
@@ -38,30 +38,30 @@
         </form>
       </div>
       <% assignments.forEach(function(assign){ %>
-      <div class="card" style="color:black">
-        <div class="card-header" style="font-weight:900">
+      <div class="card" style="color: black">
+        <div class="card-header" style="font-weight: 900">
           <%= assign.subject %>
         </div>
         <div class="card-body">
           <p class="card-text display-5"><%= assign.body %></p>
           <p>
             Due date: <% if (new Date() > new Date(assign.dueDate)) { %>
-            <span style="font-weight: bold;" class="text-danger"
+            <span style="font-weight: bold" class="text-danger"
               ><%= assign.dueDate %></span
             >
             <%}else{ %>
-            <span style="font-weight: bold;" class="text-success"
+            <span style="font-weight: bold" class="text-success"
               ><%= assign.dueDate %></span
             >
             <%}%>
           </p>
         </div>
         <a
-          href="/complete/<%= assign.body %>"
-          style="text-align:center"
+          href="/complete/<%= assign.subject %>/<%= assign.body %>/<%= assign.id %>"
+          style="text-align: center"
           class="btn-success"
           ><button
-            style="color:white"
+            style="color: white"
             class="btn"
             value="<%= assign.body %>"
             type="submit"
@@ -72,10 +72,10 @@
         >
         <a
           href="/cancel/<%= assign._id %>"
-          style="text-align:center"
+          style="text-align: center"
           class="btn-danger"
           ><button
-            style="color:white"
+            style="color: white"
             class="btn"
             value="<%= assign._id %>"
             type="submit"
